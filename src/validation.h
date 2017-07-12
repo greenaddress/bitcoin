@@ -122,6 +122,12 @@ static const unsigned int DEFAULT_BANSCORE_THRESHOLD = 100;
 static const bool DEFAULT_PERSIST_MEMPOOL = true;
 /** Default for -mempoolreplacement */
 static const bool DEFAULT_ENABLE_REPLACEMENT = true;
+/** Default for -mempoolreplacementtimeout in seconds after which transactions in mempool are replaceable (i.e. 6 hours) */
+static const int64_t DEFAULT_REPLACEMENT_TIMEOUT = 6 * 60 * 60;
+/** Default for buffer in seconds on top of the timeout after which transactions in mempool are replaceable (i.e. 6 hours) in the GUI */
+static const int64_t REPLACEMENT_TIMEOUT_BUFFER = 20 * 60;
+/** Default to enable/disable wallet/rpc ability to replace timeout transactions */
+static const bool DEFAULT_WALLET_REPLACEMENT_TIMEOUT = false;
 /** Default for using fee filter */
 static const bool DEFAULT_FEEFILTER = true;
 

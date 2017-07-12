@@ -601,6 +601,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
 
     // Check for conflicts with in-memory transactions
     std::set<uint256> setConflicts;
+    const int64_t replacement_timeout = gArgs.GetArg("-mempoolreplacementtimeout", DEFAULT_REPLACEMENT_TIMEOUT);
     for (const CTxIn &txin : tx.vin)
     {
         auto itConflicting = pool.mapNextTx.find(txin.prevout);
@@ -621,6 +622,8 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
                 // first-seen mempool behavior should be checking all
                 // unconfirmed ancestors anyway; doing otherwise is hopelessly
                 // insecure.
+                // All transactions in mempool become replaceable after the timeout.
+
                 bool fReplacementOptOut = true;
                 if (fEnableReplacement)
                 {
@@ -632,6 +635,9 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
                             break;
                         }
                     }
+                const int64_t conflicting_time = pool.info(ptxConflicting->GetHash()).nTime;
+                const bool conflicting_pretimeout = !ExpiredOptInRBFPolicy(nAcceptTime, conflicting_time, replacement_timeout);
+                fReplacementOptOut = conflicting_pretimeout && !SignalsOptInRBF(*ptxConflicting);
                 }
                 if (fReplacementOptOut) {
                     return state.Invalid(false, REJECT_DUPLICATE, "txn-mempool-conflict");
