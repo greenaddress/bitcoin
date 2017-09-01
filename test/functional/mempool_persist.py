@@ -99,12 +99,12 @@ class MempoolPersistTest(BitcoinTestFramework):
         assert os.path.isfile(mempooldat0)
 
         self.log.debug("Stop nodes, make node1 use mempool.dat from node0. Verify it has 5 transactions")
-        self.stop_nodes()
         os.rename(mempooldat0, mempooldat1)
+        self.stop_nodes()
         self.nodes.append(self.start_node(1, self.options.tmpdir))
         wait_until(lambda: len(self.nodes[1].getrawmempool()) == 5)
 
-        self.log.debug("Force core to fail to save file to disk. Check it errors.")
+        self.log.debug("Prevent bitcoind from writing mempool.dat to disk. Verify that `dumpmempool` fails")
         # to test the exception we are setting bad permissions on a tmp file called mempool.dat.new
         # which is an implementation detail that could change and break this test
         mempooldotnew1 = mempooldat1 + '.new'
